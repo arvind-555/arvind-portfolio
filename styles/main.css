@@ -1,0 +1,555 @@
+/* ============================================================================
+   main.css  —  the entire visual design system for the portfolio
+   ============================================================================
+
+   HOW THIS FILE IS ORGANISED
+   --------------------------
+   1.  Design tokens (:root)          <- colours live here. Change them once,
+                                         they update everywhere.
+   2.  Global resets & base text
+   3.  Layout shell (the 2-column grid)
+   4.  Left column  — the terminal pane
+   5.  Right column — the readable content pane
+        5a. Section headings
+        5b. Hero (name + intro)
+        5c. "Currently building" pinned card
+        5d. Off-duty list
+        5e. Projects directory list
+        5f. Stack grid
+        5g. Socials grid
+        5h. Footer
+   6.  Fixed / floating UI
+        6a. Particle mesh background
+        6b. Custom cursor
+        6c. Scroll-reveal animation
+        6d. Scroll progress bar
+        6e. Hover preview panel (follows the mouse over project rows)
+        6f. Command palette (Cmd/Ctrl+K)
+        6g. Bug Hunt mini-game
+
+   QUICK REFERENCE — "I just want to change..."
+   -------------------------------------------
+   Colours ................. edit the variables in section 1 (:root)
+   Accent colour ........... --amber  (used for every highlight, link, glow)
+   Page background ......... --bg
+   Body font size .......... section 2, `body { font-size: ... }`
+   Fonts ................... section 2 + the <link> in index.html <head>
+   Column width (desktop) .. section 3, `.shell { grid-template-columns: ... }`
+   When layout goes 1-column section 3, the `@media (max-width: 860px)` block
+   Animation feel .......... every transition uses cubic-bezier(.16,1,.3,1).
+                             Search that string to find them all. Do NOT swap
+                             it for `ease` / `linear` — the snappy-but-smooth
+                             feel of the whole site comes from this curve.
+   ============================================================================ */
+
+
+/* ============================================================================
+   1. DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   These are the ONLY place colours are defined. Every rule below refers to
+   them with `var(--name)`. To re-theme the site, change values here only.
+   ========================================================================= */
+:root {
+  --bg:        #0A0C10;   /* page background — near-black blue/charcoal        */
+  --bg-raised: #10131A;   /* slightly lighter — hover states, raised cards    */
+  --bg-pane:   #0D1016;   /* the terminal pane background                     */
+  --line:      #1E222B;   /* hairline borders & dividers everywhere           */
+  --text:      #D9DDE3;   /* primary body text                                */
+  --text-dim:  #6B7280;   /* secondary text — descriptions, captions          */
+  --text-faint:#3E4451;   /* tertiary text — timestamps, index numbers        */
+  --amber:     #F5A623;   /* THE accent. Links, highlights, cursor, glows.    */
+  --amber-dim: #8A5F1F;   /* muted accent — borders, underlines, ::selection  */
+  --green:     #4ADE80;   /* "live" status only                               */
+}
+
+
+/* ============================================================================
+   2. GLOBAL RESETS & BASE TEXT
+   ----------------------------------------------------------------------------
+   `* { margin/padding: 0 }` wipes browser defaults so spacing is fully
+   controlled by the rules below. `.mono` is a helper class you can add to any
+   element to switch it to the monospace font.
+   ========================================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }   /* smooth-scroll for in-page #anchor jumps */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;   /* UI + headings font           */
+  font-size: 15px;                             /* <-- base text size          */
+  line-height: 1.6;
+  min-height: 100vh;
+  cursor: crosshair;   /* overridden to `none` further down when the custom   */
+                       /* cursor is active; falls back to crosshair on mobile */
+}
+
+/* Highlight colour when you select text on the page */
+::selection { background: var(--amber-dim); color: #fff; }
+
+/* Add class="mono" to anything that should use the monospace font */
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+
+/* ============================================================================
+   3. LAYOUT SHELL  —  the two-column grid
+   ----------------------------------------------------------------------------
+   Desktop: fixed 380px terminal on the left, flexible content on the right.
+   Below 860px wide: everything stacks into one column and the terminal stops
+   being sticky.
+
+   To change the terminal width, edit the `380px` below.
+   ========================================================================= */
+.shell {
+  display: grid;
+  grid-template-columns: 380px 1fr;   /* [ terminal ] [ content ] */
+  min-height: 100vh;
+}
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }   /* single column */
+  /* On mobile the terminal is a normal block at the top, not a sticky sidebar.
+     `!important` is used here only to beat the more specific desktop rules. */
+  .termpane {
+    position: static !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+
+/* ============================================================================
+   4. LEFT COLUMN — THE TERMINAL PANE
+   ----------------------------------------------------------------------------
+   Structure (see index.html):
+     .termpane
+       .termbar        <- top bar: avatar, live dot, path, clock
+       #log            <- scrolling output area (lines added by scripts/terminal.js)
+       .inputrow       <- the "> " prompt and text input
+       .hint           <- the grey "try: help ..." line
+   ========================================================================= */
+.termpane {
+  position: sticky; top: 0; height: 100vh;   /* stays on screen while you scroll */
+  background: var(--bg-pane);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  padding: 20px 20px 16px;
+}
+
+/* --- top bar of the terminal --- */
+.termbar {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 14px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* the little round avatar in the terminal bar (desaturated on purpose) */
+.avatar-mini {
+  width: 26px; height: 26px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+  filter: grayscale(1) contrast(1.15) brightness(.95);
+  border: 1px solid var(--line);
+}
+
+/* status dot — grey by default, green + glowing + pulsing when class="live" */
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-faint); }
+.dot.live {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+.termbar .path  { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim);   margin-left: 4px; }
+.termbar .clock { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint); }
+
+/* --- the scrolling log where command output appears --- */
+#log {
+  flex: 1; overflow-y: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; line-height: 1.7;
+  padding-right: 4px;
+}
+#log::-webkit-scrollbar        { width: 6px; }
+#log::-webkit-scrollbar-thumb  { background: var(--line); border-radius: 3px; }
+
+/* one printed line. Colour depends on the second class added by terminal.js:
+     .cmd = something you typed   .out = normal output   .err = an error       */
+.line          { margin-bottom: 2px; white-space: pre-wrap; word-break: break-word; }
+.line.cmd      { color: var(--text); }
+.line.cmd .prompt { color: var(--amber); }
+.line.out      { color: var(--text-dim); }
+.line.out a    { color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--amber-dim); }
+.line.out a:hover { border-bottom-color: var(--amber); }
+.line.err      { color: #E06767; }   /* soft red — only place a non-token red is used */
+
+/* --- the input row you type into --- */
+.inputrow {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+}
+.inputrow .prompt { color: var(--amber); flex-shrink: 0; }
+.inputrow input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: inherit; font-size: 13px;
+  caret-color: var(--amber);   /* the blinking text cursor is amber */
+}
+
+.hint { margin-top: 8px; font-size: 11px; color: var(--text-faint); font-family: 'IBM Plex Mono', monospace; }
+
+
+/* ============================================================================
+   5. RIGHT COLUMN — THE READABLE CONTENT PANE
+   ========================================================================= */
+.contentpane { padding: 64px 56px 120px; max-width: 920px; }
+@media (max-width: 860px) { .contentpane { padding: 40px 24px 100px; } }
+
+/* vertical rhythm between the big sections. `scroll-margin-top` keeps a
+   section from butting right against the top edge after a jump-to-section. */
+section { margin-bottom: 88px; scroll-margin-top: 32px; }
+
+/* --- 5a. section headings ( "~/projects   Selected work" ) --- */
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; }
+.sec-head .idx { font-family: 'IBM Plex Mono', monospace; color: var(--text-faint); font-size: 13px; }
+.sec-head h2   { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+
+/* --- 5b. hero (top of the page: avatar + name + intro) --- */
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+@media (max-width: 600px) { .hero { grid-template-columns: 1fr; } }
+
+/* the framed avatar image. The amber ::after overlay is a colour-burn tint —
+   remove that rule if you want the photo shown normally. */
+.hero .avatar-wrap {
+  width: 96px; height: 96px; border-radius: 6px; overflow: hidden;
+  border: 1px solid var(--line); flex-shrink: 0; position: relative;
+}
+.hero .avatar-wrap img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(1) contrast(1.2) brightness(.9);
+}
+.hero .avatar-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--amber); mix-blend-mode: color-burn; opacity: .35;
+}
+
+/* the big name headline. `clamp()` = font grows with the viewport but never
+   smaller than 28px or larger than 42px. */
+.hero h1 {
+  font-size: clamp(28px, 4.5vw, 42px);
+  font-weight: 700; letter-spacing: -0.02em; line-height: 1.15;
+  max-width: 16ch;
+}
+.hero .role   { margin-top: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--amber); font-size: 14px; }
+.hero .desc   { margin-top: 18px; max-width: 52ch; color: var(--text-dim); font-size: 16px; }
+.hero .status {
+  margin-top: 28px; display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint);
+}
+
+/* --- 5c. "currently building" pinned card (the Storyphy box) --- */
+.pinned {
+  border: 1px solid var(--amber-dim);
+  background: linear-gradient(180deg, rgba(245,166,35,.06), transparent);
+  padding: 18px 20px; margin-bottom: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pinned .tag  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: .02em; }
+.pinned .name { font-size: 17px; font-weight: 600; }
+.pinned .desc { color: var(--text-dim); font-size: 14px; max-width: 56ch; }
+.pinned a {
+  color: var(--amber); font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  text-decoration: none; border-bottom: 1px solid var(--amber-dim); width: fit-content;
+}
+
+/* --- 5d. off-duty list (two columns: label | note) --- */
+.offlist { border-top: 1px solid var(--line); }
+.offrow {
+  display: grid; grid-template-columns: 160px 1fr;
+  gap: 20px; padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.offrow .label { font-family: 'IBM Plex Mono', monospace; color: var(--amber); font-size: 13px; }
+.offrow .note  { color: var(--text-dim); }
+
+/* --- 5e. projects directory list ---
+   Each row is built by scripts/render.js from the PROJECTS array.
+   Layout per row: [ name ] [ stack ] [ status tag ], with a hidden
+   `.detail` drawer that expands when the row gets class="open" (on click). */
+.dirlist { border-top: 1px solid var(--line); }
+.dirrow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 24px; align-items: center;
+  padding: 18px 4px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.dirrow:hover { background: var(--bg-raised); }
+.dirrow .name  { font-weight: 600; font-size: 16px; }
+.dirrow .stack { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); }
+.dirrow .status-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  padding: 3px 8px; border: 1px solid var(--line); border-radius: 2px;
+  color: var(--text-faint); white-space: nowrap;
+}
+.dirrow .status-tag.live { color: var(--green); border-color: #204030; }
+
+/* the expandable drawer. Animating max-height from 0 is the classic
+   CSS-only expand/collapse. If your descriptions get long and look cut off,
+   raise the `200px` in the `.dirrow.open .detail` rule. */
+.detail { max-height: 0; overflow: hidden; transition: max-height .25s ease; grid-column: 1 / -1; }
+.detail-inner { padding: 4px 4px 18px; color: var(--text-dim); font-size: 14px; max-width: 60ch; }
+.detail-inner a { color: var(--amber); }
+.dirrow.open .detail { max-height: 200px; }
+
+/* --- 5f. stack grid (languages / frontend / backend / tools) ---
+   Built by scripts/render.js from the STACK array. The 1px gap + shared
+   background colour is what draws the thin grid lines between cells. */
+.stackgrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1px; background: var(--line); border: 1px solid var(--line);
+}
+.stackitem { background: var(--bg); padding: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-dim); }
+.stackitem .cat { display: block; font-size: 10px; color: var(--text-faint); margin-bottom: 6px; }
+
+/* --- 5g. socials grid ---
+   Built by scripts/render.js from the SOCIALS array. */
+.socialgrid { display: flex; flex-wrap: wrap; gap: 14px; }
+.social {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--line); padding: 12px 16px;
+  text-decoration: none; color: var(--text);
+  transition: border-color .2s ease, background .2s ease;
+}
+.social:hover { border-color: var(--amber-dim); background: var(--bg-raised); }
+.social .mono-badge {
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-dim);
+}
+.social:hover .mono-badge { border-color: var(--amber); color: var(--amber); }
+.social .s-name   { font-size: 14px; font-weight: 600; }
+.social .s-handle { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint); }
+
+/* --- 5h. footer --- */
+footer {
+  padding: 32px 56px; border-top: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+footer a         { color: var(--text-dim); text-decoration: none; }
+footer a:hover   { color: var(--amber); }
+
+/* Respect the OS "reduce motion" setting: kill the pulsing dot and smooth
+   scroll. (The scripts do their own reduced-motion checks separately.) */
+@media (prefers-reduced-motion: reduce) {
+  .dot.live { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+
+/* ============================================================================
+   6. FIXED / FLOATING UI
+   ========================================================================= */
+
+/* --- 6a. particle mesh background ---
+   A <canvas> pinned behind everything (z-index:0). Drawn by scripts/background.js.
+   `.contentpane` and `.termpane` are lifted to z-index:1 so they sit on top. */
+#mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: .55;   /* <-- lower this to make the background dots more subtle */
+}
+.contentpane, .shell > .termpane { position: relative; z-index: 1; }
+
+/* --- 6b. custom cursor ---
+   Two elements (a solid dot + a lagging ring) positioned by scripts/cursor.js.
+   The real cursor is hidden (`cursor: none`) on desktop and restored on mobile. */
+body { cursor: none; }
+.cursor-dot, .cursor-ring {
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: 10010;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);   /* centre the element on the mouse point */
+}
+.cursor-dot {
+  width: 8px; height: 8px; background: var(--amber);
+  box-shadow: 0 0 10px 2px rgba(245,166,35,.6);
+}
+.cursor-ring {
+  width: 32px; height: 32px; border: 1px solid var(--amber-dim);
+  transition: width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), border-color .25s ease;
+}
+.cursor-ring.hover { width: 54px; height: 54px; border-color: var(--amber); }  /* grows over links/buttons */
+
+@media (max-width: 860px) {
+  body { cursor: auto; }                        /* normal cursor back on touch/small screens */
+  .cursor-dot, .cursor-ring { display: none; }
+}
+
+/* --- 6c. scroll reveal ---
+   scripts/motion.js adds class="reveal" to elements, then class="in" when they
+   scroll into view. The transition here is what you actually see (fade + rise +
+   un-blur). Uses the house easing curve. */
+.reveal {
+  opacity: 0; transform: translateY(28px); filter: blur(6px);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), filter .8s cubic-bezier(.16,1,.3,1);
+}
+.reveal.in { opacity: 1; transform: translateY(0); filter: blur(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
+/* helper used by the hero decode effect (kept for completeness) */
+.hero h1 .fixed-char { opacity: 1; }
+
+/* --- 6d. scroll progress bar (thin amber line across the very top) --- */
+#progress {
+  position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+  background: var(--amber); box-shadow: 0 0 8px var(--amber);
+  z-index: 9998; transition: width .1s linear;   /* width is set by scripts/motion.js */
+}
+
+/* --- 6e. hover preview panel ---
+   A small box that follows the mouse when you hover a project row. Its content
+   (a generated stripe pattern) is set by scripts/hover-preview.js.
+   TODO (optional): swap the generated `.pattern` background for real project
+   screenshots — see the note in scripts/hover-preview.js. */
+#hoverPreview {
+  position: fixed; top: 0; left: 0; z-index: 9997;
+  width: 180px; height: 130px;
+  transform: translate(-50%, -50%) scale(.9);
+  opacity: 0; pointer-events: none;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  overflow: hidden;
+  transition: opacity .25s cubic-bezier(.16,1,.3,1), transform .25s cubic-bezier(.16,1,.3,1);
+}
+#hoverPreview.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#hoverPreview .pattern { width: 100%; height: 100%; }
+#hoverPreview .plabel {
+  position: absolute; bottom: 8px; left: 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--amber);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+@media (max-width: 860px) { #hoverPreview { display: none; } }
+
+/* --- 6f. command palette (opens with Cmd/Ctrl+K or "/") --- */
+#palette-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(6,7,10,.7); backdrop-filter: blur(3px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 14vh;
+}
+#palette-overlay.open { display: flex; }
+#palette {
+  width: 560px; max-width: 90vw; max-height: 60vh;
+  background: var(--bg-pane); border: 1px solid var(--line);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  display: flex; flex-direction: column;
+  animation: paletteIn .18s cubic-bezier(.16,1,.3,1);
+}
+@keyframes paletteIn { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+#paletteInput {
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+  padding: 18px 20px; border-bottom: 1px solid var(--line);
+}
+#paletteList { overflow-y: auto; padding: 8px; }
+.p-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 12px; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-dim);
+}
+.p-item .pi-cat   { color: var(--text-faint); font-size: 11px; }
+.p-item.active    { background: var(--bg-raised); color: var(--text); }   /* keyboard-highlighted row */
+.p-item.active .pi-cat { color: var(--amber); }
+#paletteHint {
+  border-top: 1px solid var(--line); padding: 8px 16px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-faint);
+  display: flex; gap: 16px;
+}
+
+/* the little "Cmd K quick nav" chip bottom-right */
+#cmdkHint {
+  position: fixed; bottom: 18px; right: 18px; z-index: 50;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-faint);
+  border: 1px solid var(--line); padding: 6px 10px; background: var(--bg-pane);
+  display: flex; align-items: center; gap: 6px;
+}
+#cmdkHint kbd { border: 1px solid var(--line); padding: 1px 5px; border-radius: 2px; color: var(--text-dim); }
+@media (max-width: 860px) { #cmdkHint { display: none; } }
+
+/* --- 6g. bug hunt mini-game --- */
+
+/* the "found a bug? click to play" chip bottom-left */
+#gameTrigger {
+  position: fixed; bottom: 18px; left: 18px; z-index: 50;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim);
+  border: 1px solid var(--line); padding: 7px 12px; background: var(--bg-pane);
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  transition: border-color .2s ease, color .2s ease;
+}
+#gameTrigger:hover { border-color: var(--amber); color: var(--amber); }
+#gameTrigger .bd { width: 6px; height: 6px; border: 1px solid var(--amber); flex-shrink: 0; }
+
+/* full-screen game overlay */
+#gameOverlay {
+  position: fixed; inset: 0; z-index: 10001;
+  background: var(--bg); display: none;
+  flex-direction: column;
+}
+#gameOverlay.open { display: flex; }
+#gameBar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-dim);
+}
+#gameBar .g-title { color: var(--text); }
+#gameBar .g-stats { display: flex; gap: 20px; }
+#gameClose { cursor: pointer; color: var(--text-faint); font-size: 18px; }
+#gameClose:hover { color: var(--amber); }
+
+/* the playfield. The double linear-gradient makes the faint 28px graph-paper grid. */
+#gameArena {
+  position: relative; flex: 1; overflow: hidden;
+  background:
+    linear-gradient(rgba(245,166,35,.03) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, rgba(245,166,35,.03) 1px, transparent 1px) 0 0 / 28px 28px;
+}
+
+/* a single "bug" target. Pops in with a slight overshoot, pops out when clicked. */
+.bug {
+  position: absolute; width: 34px; height: 34px;
+  border: 1.5px solid var(--amber); background: rgba(245,166,35,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--amber);
+  cursor: pointer; transform: translate(-50%, -50%) scale(0);
+  animation: bugIn .12s cubic-bezier(.34,1.56,.64,1) forwards;
+  user-select: none;
+}
+@keyframes bugIn  { to { transform: translate(-50%, -50%) scale(1); } }
+.bug.squash { animation: bugOut .15s ease forwards; }
+@keyframes bugOut { to { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
+
+/* the end-of-round panel */
+#gameEnd {
+  position: absolute; inset: 0; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; text-align: center; background: rgba(10,12,16,.92);
+}
+#gameEnd.show { display: flex; }
+#gameEnd .g-score   { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--text-dim); }
+#gameEnd .g-score b  { color: var(--amber); font-size: 22px; }
+#gameEnd .g-line    { font-size: 24px; font-weight: 600; }
+#gameEnd button {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--bg);
+  background: var(--amber); border: none; padding: 12px 22px;
+  cursor: pointer; transition: filter .2s ease;
+}
+#gameEnd button:hover { filter: brightness(1.1); }
+@media (max-width: 860px) { #gameTrigger { display: none; } }

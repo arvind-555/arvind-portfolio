@@ -1,0 +1,14 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel CLI
+.vercel
+
+# Node (only if you ever add tooling — this project needs none right now)
+node_modules/
+npm-debug.log*

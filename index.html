@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================================
+     PAGE METADATA
+     ----------------------------------------------------------------------------
+     TODO: tweak the title / description below. The description is what shows up
+     under the link in Google results and when the URL is shared.
+     ========================================================================= -->
+<title>Arvind Pal — builder</title>
+<meta name="description" content="Arvind Pal — I build things, mostly software. Co-founder &amp; CTO at Storyphy.">
+
+<!-- Social share preview (optional). TODO: create assets/og-image.png (1200×630)
+     and set the two URLs below to your real domain once you have one, then
+     uncomment this block.
+<meta property="og:title" content="Arvind Pal — builder">
+<meta property="og:description" content="I build things, mostly software.">
+<meta property="og:image" content="https://YOUR-DOMAIN/assets/og-image.png">
+<meta property="og:url" content="https://YOUR-DOMAIN/">
+<meta name="twitter:card" content="summary_large_image">
+-->
+
+<!-- Fonts: IBM Plex Sans (UI/headings) + IBM Plex Mono (terminal/data).
+     To change fonts you must change BOTH this line AND the font-family rules
+     in styles/main.css (section 2). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- The entire design system. All colours, spacing, fonts and animations. -->
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<!-- ============================================================================
+     FLOATING / FIXED ELEMENTS
+     These sit outside the main layout. Each is driven by a script in scripts/.
+     ========================================================================= -->
+
+<canvas id="mesh"></canvas>                        <!-- particle background  → scripts/background.js -->
+<div class="cursor-ring" id="cursorRing"></div>    <!-- custom cursor        → scripts/cursor.js -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div id="progress"></div>                          <!-- scroll progress bar  → scripts/motion.js -->
+
+<!-- hover preview panel (follows the mouse over project rows) → scripts/hover-preview.js -->
+<div id="hoverPreview">
+  <div class="pattern" id="hoverPattern"></div>
+  <span class="plabel" id="hoverLabel"></span>
+</div>
+
+<!-- bottom-corner chips -->
+<div id="cmdkHint" style="cursor:pointer;"><kbd>&#8984;</kbd><kbd>K</kbd> quick nav <span style="opacity:.6;">or /</span></div>
+<div id="gameTrigger"><span class="bd"></span>found a bug? &middot; click to play</div>
+
+<!-- bug hunt game overlay → scripts/bug-hunt.js -->
+<div id="gameOverlay">
+  <div id="gameBar">
+    <span class="g-title">bug_hunt.exe</span>
+    <div class="g-stats">
+      <span>score: <span id="gScore">0</span></span>
+      <span id="gTime">15.0s</span>
+    </div>
+    <span id="gameClose">&times;</span>
+  </div>
+  <div id="gameArena">
+    <div id="gameEnd">
+      <!-- TODO: end-of-round copy — currently in Hinglish, change if you like -->
+      <div class="g-score">you squashed <b id="gFinalScore">0</b> bugs</div>
+      <div class="g-line">badhiya tha na?</div>
+      <button id="gameReplay">firse dekhna hai?</button>
+    </div>
+  </div>
+</div>
+
+<!-- command palette overlay → scripts/command-palette.js -->
+<div id="palette-overlay">
+  <div id="palette">
+    <input id="paletteInput" type="text" placeholder="Jump to a section, project, or action..." autocomplete="off" spellcheck="false">
+    <div id="paletteList"></div>
+    <div id="paletteHint"><span>&uarr;&darr; navigate</span><span>&crarr; select</span><span>esc close</span></div>
+  </div>
+</div>
+
+
+<!-- ============================================================================
+     MAIN LAYOUT — two columns (see .shell in styles/main.css section 3)
+     ========================================================================= -->
+<div class="shell">
+
+  <!-- ────────────────────────────────────────────────────────────────────────
+       LEFT COLUMN — the functional terminal (behaviour → scripts/terminal.js)
+       ──────────────────────────────────────────────────────────────────────── -->
+  <div class="termpane">
+    <div class="termbar">
+      <img class="avatar-mini" src="assets/avatar.jpg" alt="">
+      <span class="dot live"></span>
+      <span class="path">guest@portfolio:~$</span>
+      <span class="clock" id="clock"></span>          <!-- filled by scripts/render.js -->
+    </div>
+    <div id="log"></div>                              <!-- command output appears here -->
+    <div class="inputrow">
+      <span class="prompt">&gt;</span>
+      <input id="cmdInput" type="text" autocomplete="off" spellcheck="false" placeholder="type 'help'">
+    </div>
+    <div class="hint">try: help &middot; ls &middot; open hhgoa-card &middot; whoami &middot; contact</div>
+  </div>
+
+
+  <!-- ────────────────────────────────────────────────────────────────────────
+       RIGHT COLUMN — the readable content
+       ──────────────────────────────────────────────────────────────────────── -->
+  <div class="contentpane">
+
+    <!-- ==== HERO ==============================================================
+         TODO CONTENT:
+           • The <h1> text: "Arvind Pal — builder." The word before the period
+             is the tagline — change "builder" to whatever fits (the hero
+             "decode" animation in scripts/motion.js reads whatever is here).
+           • .role  — your one-line role/status line.
+           • .desc  — the intro paragraph. Rewrite in your own voice.
+           • .status — the little monospace status line.
+         ==================================================================== -->
+    <section class="hero" id="sec-home">
+      <div class="avatar-wrap"><img src="assets/avatar.jpg" alt="Arvind Pal"></div>
+      <div>
+        <h1 id="heroTitle">Arvind Pal — builder.</h1>
+        <div class="role mono">Co-founder &amp; CTO @ Storyphy — and a few other things</div>
+        <p class="desc">I build things, mostly software. This is one of the rare pages I've actually written words for, so go easy on it.</p>
+        <div class="status">
+          <span class="dot live" style="width:6px;height:6px;"></span>
+          STATUS: caffeinated, probably building something
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== PROJECTS ==========================================================
+         The pinned "currently building" card is hand-written here.
+         The list below it (#dirlist) is generated from the PROJECTS array in
+         scripts/config.js — edit projects THERE, not here.
+         ==================================================================== -->
+    <section id="sec-projects">
+      <div class="sec-head"><span class="idx mono">~/projects</span><h2>Selected work</h2></div>
+
+      <!-- TODO CONTENT: confirm this Storyphy blurb is accurate / in your voice -->
+      <div class="pinned">
+        <span class="tag">CURRENTLY BUILDING</span>
+        <span class="name">Storyphy</span>
+        <p class="desc">Personalised storybooks that turn a kid's name, photo, and interests into a printed book where they're the main character. Co-founder &amp; CTO — I built the product end to end.</p>
+        <a href="https://storyphy.in" target="_blank" rel="noopener">storyphy.in</a>
+      </div>
+
+      <div class="dirlist" id="dirlist"><!-- rows injected by scripts/render.js from PROJECTS --></div>
+    </section>
+
+    <!-- ==== STACK =============================================================
+         Generated from the STACK array in scripts/config.js — edit it there.
+         ==================================================================== -->
+    <section id="sec-stack">
+      <div class="sec-head"><span class="idx mono">~/stack</span><h2>Tools &amp; languages</h2></div>
+      <div class="stackgrid" id="stackgrid"><!-- injected by scripts/render.js from STACK --></div>
+    </section>
+
+    <!-- ==== OFF-DUTY ==========================================================
+         TODO CONTENT: these five lines are hand-written. Tweak wording so it
+         sounds like you. (The terminal `off-duty` command has its own short
+         version of this list in scripts/terminal.js — update both if you
+         change the activities.)
+         ==================================================================== -->
+    <section id="sec-offduty">
+      <div class="sec-head"><span class="idx mono">~/off-duty</span><h2>When I'm not building</h2></div>
+      <div class="offlist">
+        <div class="offrow"><span class="label">gym</span><span class="note">mandatory. ask my knees how it's going.</span></div>
+        <div class="offrow"><span class="label">travel</span><span class="note">collecting timezones faster than frequent flyer points.</span></div>
+        <div class="offrow"><span class="label">stand-up</span><span class="note">I watch it religiously, I don't perform it. yet.</span></div>
+        <div class="offrow"><span class="label">doom scrolling</span><span class="note">world-class, unfortunately. send help, or don't, I won't see it.</span></div>
+        <div class="offrow"><span class="label">solo walks</span><span class="note">where most of my actual debugging happens. no headphones, just bugs.</span></div>
+      </div>
+    </section>
+
+    <!-- ==== SOCIALS ===========================================================
+         Generated from the SOCIALS array in scripts/config.js — edit it there.
+         (That one array also feeds the terminal `socials` command and the
+         command palette, so you only update handles in one place.)
+         ==================================================================== -->
+    <section id="sec-socials">
+      <div class="sec-head"><span class="idx mono">~/socials</span><h2>Elsewhere</h2></div>
+      <div class="socialgrid" id="socialgrid"><!-- injected by scripts/render.js from SOCIALS --></div>
+    </section>
+
+    <!-- ==== CONTACT ===========================================================
+         The email link (#contactEmail) gets its address from SITE.email in
+         scripts/config.js — change your email THERE and it updates here, in
+         the terminal `contact` command, and in the palette "Copy email" action.
+         ==================================================================== -->
+    <section id="sec-contact">
+      <div class="sec-head"><span class="idx mono">~/contact</span><h2>Reach out</h2></div>
+      <p style="color:var(--text-dim); max-width:50ch;">Fastest way to reach me is email. Or use the terminal on the left — type <span class="mono" style="color:var(--amber)">contact</span>.</p>
+      <p style="margin-top:16px;">
+        <a id="contactEmail" href="#" class="mono" style="color:var(--amber); text-decoration:none; border-bottom:1px solid var(--amber-dim);">loading…</a>
+      </p>
+    </section>
+
+  </div>
+</div>
+
+<footer>
+  <span>&copy; <span id="year"></span> — built by hand, not a template</span>
+  <span><a href="#sec-home">back to top</a></span>
+</footer>
+
+
+<!-- ============================================================================
+     SCRIPTS — ORDER MATTERS
+     ----------------------------------------------------------------------------
+     These are plain <script> tags (no build step). They share one global
+     scope and run top-to-bottom, so each file can use things defined in the
+     files above it. If you reorder these, things WILL break. The dependency
+     each file has is noted in a comment at the top of that file.
+
+       config.js          data you edit (must be first)
+       render.js          builds projects / stack / socials from config
+       terminal.js        the terminal; defines printLine + scrollToSection
+       cursor.js          custom cursor
+       background.js      particle mesh
+       motion.js          scroll reveal + hero decode + progress bar
+       hover-preview.js   mouse-following project preview
+       command-palette.js Cmd/Ctrl+K palette
+       bug-hunt.js        the mini-game; defines openGame
+       easter-eggs.js     Konami code
+       boot.js            terminal intro text (must be last)
+     ========================================================================= -->
+<script src="scripts/config.js"></script>
+<script src="scripts/render.js"></script>
+<script src="scripts/terminal.js"></script>
+<script src="scripts/cursor.js"></script>
+<script src="scripts/background.js"></script>
+<script src="scripts/motion.js"></script>
+<script src="scripts/hover-preview.js"></script>
+<script src="scripts/command-palette.js"></script>
+<script src="scripts/bug-hunt.js"></script>
+<script src="scripts/easter-eggs.js"></script>
+<script src="scripts/boot.js"></script>
+
+<!-- Vercel Web Analytics (privacy-friendly page-view counts).
+     This 404s when you open the file locally — that's expected and harmless.
+     It only works once the site is deployed on Vercel AND Web Analytics is
+     turned on in the project's dashboard (Analytics tab → Enable).
+     To remove analytics entirely, delete these two lines. -->
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
