@@ -25,7 +25,13 @@ const BOOT = [
 let bootIndex = 0;
 
 function playBoot() {
-  if (bootIndex >= BOOT.length) { input.focus(); return; }
+  // Don't steal focus back to the terminal if the typing-speedrun overlay
+  // is open — a user who opened it fast (right after page load) would have
+  // their keystrokes silently redirected mid-round otherwise.
+  if (bootIndex >= BOOT.length) {
+    if (!gameOverlay.classList.contains('open')) input.focus();
+    return;
+  }
   const [cls, text] = BOOT[bootIndex++];
   printLine(text, cls);
   setTimeout(playBoot, 220);

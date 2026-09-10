@@ -25,7 +25,7 @@
         6d. Scroll progress bar
         6e. Hover preview panel (follows the mouse over project rows)
         6f. Command palette (Cmd/Ctrl+K)
-        6g. Bug Hunt mini-game
+        6g. Typing Speedrun mini-game
 
    QUICK REFERENCE — "I just want to change..."
    -------------------------------------------
@@ -200,6 +200,21 @@ body {
 }
 
 .hint { margin-top: 8px; font-size: 11px; color: var(--text-faint); font-family: 'IBM Plex Mono', monospace; }
+
+/* mobile-only tappable command shortcuts — hidden on desktop, where typing
+   the real command is just as fast. Shown below 860px (see section 3's
+   breakpoint) since a phone keyboard is enough friction that most visitors
+   won't bother typing into the terminal otherwise. */
+.quickcmds { display: none; }
+@media (max-width: 860px) {
+  .quickcmds { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .quickcmds button {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--amber);
+    background: var(--bg-raised); border: 1px solid var(--line);
+    padding: 6px 12px; cursor: pointer; transition: border-color .2s ease;
+  }
+  .quickcmds button:active { border-color: var(--amber); }
+}
 
 
 /* ============================================================================
@@ -484,9 +499,9 @@ body { cursor: none; }
 #cmdkHint kbd { border: 1px solid var(--line); padding: 1px 5px; border-radius: 2px; color: var(--text-dim); }
 @media (max-width: 860px) { #cmdkHint { display: none; } }
 
-/* --- 6g. bug hunt mini-game --- */
+/* --- 6g. typing speedrun mini-game --- */
 
-/* the "found a bug? click to play" chip bottom-left */
+/* the "test your typing speed" chip bottom-left */
 #gameTrigger {
   position: fixed; bottom: 18px; left: 18px; z-index: 50;
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim);
@@ -517,24 +532,25 @@ body { cursor: none; }
 /* the playfield. The double linear-gradient makes the faint 28px graph-paper grid. */
 #gameArena {
   position: relative; flex: 1; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; padding: 40px;
   background:
     linear-gradient(rgba(245,166,35,.03) 1px, transparent 1px) 0 0 / 28px 28px,
     linear-gradient(90deg, rgba(245,166,35,.03) 1px, transparent 1px) 0 0 / 28px 28px;
 }
 
-/* a single "bug" target. Pops in with a slight overshoot, pops out when clicked. */
-.bug {
-  position: absolute; width: 34px; height: 34px;
-  border: 1.5px solid var(--amber); background: rgba(245,166,35,.08);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--amber);
-  cursor: pointer; transform: translate(-50%, -50%) scale(0);
-  animation: bugIn .12s cubic-bezier(.34,1.56,.64,1) forwards;
-  user-select: none;
+/* the snippet you're typing, and the real (invisible) input that captures it */
+#typeWrap { max-width: 640px; width: 100%; }
+#typeSnippet {
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px; line-height: 1.6;
+  letter-spacing: .3px; word-break: break-word;
 }
-@keyframes bugIn  { to { transform: translate(-50%, -50%) scale(1); } }
-.bug.squash { animation: bugOut .15s ease forwards; }
-@keyframes bugOut { to { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
+#typeSnippet .pending { color: var(--text-faint); }
+#typeSnippet .correct { color: var(--text); }
+#typeSnippet .wrong   { color: #F5625C; background: rgba(245, 98, 92, .12); }
+#typeSnippet .current { border-left: 2px solid var(--amber); animation: caretBlink 1s step-end infinite; }
+@keyframes caretBlink { 50% { border-color: transparent; } }
+/* visually hidden but still focusable/typeable — clicking the arena refocuses it (see speedrun.js) */
+#typeInput { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 
 /* the end-of-round panel */
 #gameEnd {

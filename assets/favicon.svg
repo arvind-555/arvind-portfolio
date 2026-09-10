@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="13" fill="#0D1016"/>
+  <rect x="1" y="1" width="62" height="62" rx="12" fill="none" stroke="#1E222B" stroke-width="2"/>
+  <text x="32" y="41" font-family="Consolas, 'IBM Plex Mono', monospace" font-size="30" font-weight="700"
+        fill="#F5A623" text-anchor="middle">&gt;_</text>
+</svg>

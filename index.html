@@ -13,15 +13,41 @@
 <title>Arvind Pal — builder</title>
 <meta name="description" content="Arvind Pal — I build things, mostly software. Co-founder &amp; CTO at Storyphy.">
 
-<!-- Social share preview (optional). TODO: create assets/og-image.png (1200×630)
-     and set the two URLs below to your real domain once you have one, then
-     uncomment this block.
+<!-- Favicon. favicon.svg is the real one (crisp at any size, matches the
+     terminal-prompt ">_" motif); the PNGs are fallbacks for browsers/devices
+     that don't do SVG favicons yet. -->
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<!-- Social share preview — shows up when this link is pasted into iMessage,
+     Slack, LinkedIn, X, etc. og-image.png already exists (1200×630).
+     TODO: swap YOUR-DOMAIN for your real domain once you have one (or your
+     vercel.app URL in the meantime), then this is live as-is. -->
 <meta property="og:title" content="Arvind Pal — builder">
-<meta property="og:description" content="I build things, mostly software.">
+<meta property="og:description" content="I build things, mostly software. Co-founder &amp; CTO at Storyphy.">
 <meta property="og:image" content="https://YOUR-DOMAIN/assets/og-image.png">
 <meta property="og:url" content="https://YOUR-DOMAIN/">
 <meta name="twitter:card" content="summary_large_image">
--->
+
+<!-- Structured data — lets search engines (and AI answers) know who this
+     page is about. Harmless if you never touch it again. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Arvind Pal",
+  "jobTitle": "Co-founder & CTO",
+  "worksFor": { "@type": "Organization", "name": "Storyphy", "url": "https://storyphy.in" },
+  "url": "https://YOUR-DOMAIN/",
+  "sameAs": [
+    "https://github.com/arvind-555",
+    "https://www.linkedin.com/in/arvind-pal-1b156527b/",
+    "https://www.instagram.com/arvind.env",
+    "https://x.com/gamer_ard_"
+  ]
+}
+</script>
 
 <!-- Fonts: IBM Plex Sans (UI/headings) + IBM Plex Mono (terminal/data).
      To change fonts you must change BOTH this line AND the font-family rules
@@ -53,22 +79,28 @@
 
 <!-- bottom-corner chips -->
 <div id="cmdkHint" style="cursor:pointer;"><kbd>&#8984;</kbd><kbd>K</kbd> quick nav <span style="opacity:.6;">or /</span></div>
-<div id="gameTrigger"><span class="bd"></span>found a bug? &middot; click to play</div>
+<div id="gameTrigger"><span class="bd"></span>test your typing speed &middot; click to play</div>
 
-<!-- bug hunt game overlay → scripts/bug-hunt.js -->
+<!-- typing speedrun overlay → scripts/speedrun.js -->
 <div id="gameOverlay">
   <div id="gameBar">
-    <span class="g-title">bug_hunt.exe</span>
+    <span class="g-title">speedrun.exe</span>
     <div class="g-stats">
-      <span>score: <span id="gScore">0</span></span>
-      <span id="gTime">15.0s</span>
+      <span>errors: <span id="gErrors">0</span></span>
+      <span id="gTime">0.0s</span>
     </div>
     <span id="gameClose">&times;</span>
   </div>
   <div id="gameArena">
+    <div id="typeWrap">
+      <div id="typeSnippet"></div>
+      <!-- invisible input that actually captures keystrokes; #typeSnippet is
+           what's visibly rendered, coloured character-by-character in JS -->
+      <input id="typeInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </div>
     <div id="gameEnd">
       <!-- TODO: end-of-round copy — currently in Hinglish, change if you like -->
-      <div class="g-score">you squashed <b id="gFinalScore">0</b> bugs</div>
+      <div class="g-score">you typed at <b id="gFinalScore">0</b> WPM</div>
       <div class="g-line">badhiya tha na?</div>
       <button id="gameReplay">firse dekhna hai?</button>
     </div>
@@ -106,6 +138,16 @@
       <input id="cmdInput" type="text" autocomplete="off" spellcheck="false" placeholder="type 'help'">
     </div>
     <div class="hint">try: help &middot; ls &middot; open hhgoa-card &middot; whoami &middot; contact</div>
+
+    <!-- mobile-only tappable shortcuts (hidden on desktop, CSS section 4) —
+         typing on a phone keyboard is friction most mobile visitors skip,
+         so these run a command the same way typing it would. -->
+    <div class="quickcmds" id="quickCmds">
+      <button data-cmd="help">help</button>
+      <button data-cmd="ls">ls</button>
+      <button data-cmd="whoami">whoami</button>
+      <button data-cmd="contact">contact</button>
+    </div>
   </div>
 
 
@@ -228,7 +270,7 @@
        motion.js          scroll reveal + hero decode + progress bar
        hover-preview.js   mouse-following project preview
        command-palette.js Cmd/Ctrl+K palette
-       bug-hunt.js        the mini-game; defines openGame
+       speedrun.js        the mini-game; defines openGame
        easter-eggs.js     Konami code
        boot.js            terminal intro text (must be last)
      ========================================================================= -->
@@ -240,7 +282,7 @@
 <script src="scripts/motion.js"></script>
 <script src="scripts/hover-preview.js"></script>
 <script src="scripts/command-palette.js"></script>
-<script src="scripts/bug-hunt.js"></script>
+<script src="scripts/speedrun.js"></script>
 <script src="scripts/easter-eggs.js"></script>
 <script src="scripts/boot.js"></script>
 

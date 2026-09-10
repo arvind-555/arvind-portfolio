@@ -37,8 +37,7 @@ const SITE = {
   email: 'ard.arvind.2005@gmail.com',
 
   // Shown by the terminal `whoami` command.
-  // TODO: replace with a real one-line answer to "who are you?" in your voice.
-  whoami: 'TODO: one-line intro for the `whoami` command — e.g. "Arvind — I build software, currently co-founder & CTO at Storyphy."',
+  whoami: 'uid=1(arvind) groups=(builder,overthinker,chai-enthusiast) — co-founder & CTO @ Storyphy, shipping things that occasionally work on the first try.',
 
   // The "currently building" project. Used by the terminal `storyphy` command.
   // (The visible card for this is in index.html, in the projects section.)
@@ -73,30 +72,29 @@ const PROJECTS = [
   {
     id: 'storyphy-engine',
     name: 'Storyphy Engine',
-    stack: '— add stack',                       // TODO: real stack, e.g. 'TypeScript · Node · Postgres'
+    stack: 'Python',
     status: 'internal',
     repo: 'https://github.com/arvind-555/storyphy_engine_v3',
     url: null,
     desc: 'The internal engine powering Storyphy — not public-facing, so no live link, just the repo.',
-    // TODO (optional): a sentence or two more detail is fine here.
   },
   {
     id: 'hhgoa-card',
     name: 'HHGOA ID Card Generator',
-    stack: '— add stack',                       // TODO: real stack
+    stack: 'Python · Playwright · Polygon (Amoy) · Web3',
     status: 'live',
     repo: 'https://github.com/arvind-555/hhgoa-card',
     url: 'https://hhgoa-card-alpha.vercel.app/',
-    desc: 'One or two real sentences on what this does and who it\'s for.',   // TODO: real description
+    desc: 'Generates ID cards for HH Goa with two anti-fraud layers baked into the pipeline: a Bing reverse-image-search fallback that flags reused/fake photos, and an on-chain (Polygon Amoy) tamper-verification hash so any card\'s authenticity can be checked independently.',
   },
   {
     id: 'campuslore',
     name: 'CampusLore',
-    stack: '— add stack',                       // TODO: real stack
+    stack: 'Next.js',
     status: 'live',
     repo: 'https://github.com/arvind-555/campus-app',
     url: 'https://campus-app-self.vercel.app/',
-    desc: 'One or two real sentences on what this does and who it\'s for.',   // TODO: real description
+    desc: 'One or two real sentences on what this does and who it\'s for.',   // TODO: real description — I don't have enough detail on what CampusLore actually does to write this accurately.
   },
 ];
 

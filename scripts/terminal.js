@@ -19,7 +19,7 @@
 
    DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS).
    PROVIDES (used by later scripts): scrollToSection(), printLine(), `input`.
-   `openGame()` is called by the `play` command but defined in bug-hunt.js —
+   `openGame()` is called by the `play` command but defined in speedrun.js —
    that's fine, it only needs to exist by the time someone types `play`.
    ========================================================================= */
 
@@ -92,8 +92,8 @@ const COMMANDS = {
   },
 
   play() {
-    printLine(`launching bug_hunt.exe ...`);
-    openGame();   // defined in scripts/bug-hunt.js
+    printLine(`launching speedrun.exe ...`);
+    openGame();   // defined in scripts/speedrun.js
   },
 
   whoami() {
@@ -192,4 +192,12 @@ input.addEventListener('keydown', (e) => {
     runCommand(input.value);
     input.value = '';
   }
+});
+
+/* ---- mobile quick-command chips (index.html #quickCmds, mobile-only via
+   CSS) — run a command the same way typing it would, since a phone keyboard
+   is enough friction that most mobile visitors won't type into the terminal
+   otherwise. ---- */
+document.querySelectorAll('#quickCmds button').forEach(btn => {
+  btn.addEventListener('click', () => runCommand(btn.dataset.cmd));
 });
