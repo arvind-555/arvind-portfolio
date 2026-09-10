@@ -39,12 +39,14 @@ scripts/                 Plain <script> files, loaded in order by index.html.
   motion.js              Scroll reveal + hero "decode" + scroll progress bar.
   hover-preview.js       The panel that follows the mouse over project rows.
   command-palette.js     The Cmd/Ctrl+K quick-nav palette.
-  bug-hunt.js            The "Bug Hunt" mini-game.
+  jokebot.js             The "Joke Bot" mini-game (edit the jokes in there).
   easter-eggs.js         The Konami code.
   boot.js                The terminal's intro text (loads last).
 
 assets/
   avatar.jpg             Your photo (used in the hero and the terminal bar).
+  favicon.svg            Browser-tab icon (+ favicon.png / apple-touch-icon.png
+                         fallbacks). og-image.png is the link-share preview.
 ```
 
 ---

@@ -25,9 +25,8 @@ const BOOT = [
 let bootIndex = 0;
 
 function playBoot() {
-  // Don't steal focus back to the terminal if the typing-speedrun overlay
-  // is open — a user who opened it fast (right after page load) would have
-  // their keystrokes silently redirected mid-round otherwise.
+  // Don't yank focus back to the terminal if the joke-bot overlay is open
+  // (someone could open it before this boot sequence finishes).
   if (bootIndex >= BOOT.length) {
     if (!gameOverlay.classList.contains('open')) input.focus();
     return;

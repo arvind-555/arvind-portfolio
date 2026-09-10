@@ -19,7 +19,7 @@
 
    DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS).
    PROVIDES (used by later scripts): scrollToSection(), printLine(), `input`.
-   `openGame()` is called by the `play` command but defined in speedrun.js —
+   `openGame()` is called by the `play` command but defined in jokebot.js —
    that's fine, it only needs to exist by the time someone types `play`.
    ========================================================================= */
 
@@ -92,8 +92,8 @@ const COMMANDS = {
   },
 
   play() {
-    printLine(`launching speedrun.exe ...`);
-    openGame();   // defined in scripts/speedrun.js
+    printLine(`launching joke_bot.exe ...`);
+    openGame();   // defined in scripts/jokebot.js
   },
 
   whoami() {

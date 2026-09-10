@@ -90,11 +90,11 @@ const PROJECTS = [
   {
     id: 'campuslore',
     name: 'CampusLore',
-    stack: 'Next.js',
+    stack: 'Next.js · Tailwind · PWA',
     status: 'live',
     repo: 'https://github.com/arvind-555/campus-app',
     url: 'https://campus-app-self.vercel.app/',
-    desc: 'One or two real sentences on what this does and who it\'s for.',   // TODO: real description — I don't have enough detail on what CampusLore actually does to write this accurately.
+    desc: 'An anonymous confessions board and social feed scoped to a campus — students post anonymously, scroll the feed, and keep a lightweight profile. Mobile-first, installable as a PWA.',
   },
 ];
 

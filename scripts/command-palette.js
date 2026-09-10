@@ -17,7 +17,7 @@
    the site. To add a one-off command, push another object into PALETTE_ITEMS.
 
    DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS), terminal.js (scrollToSection),
-   speedrun.js (openGame — only needed when that entry is chosen).
+   jokebot.js (openGame — only needed when that entry is chosen).
    ========================================================================= */
 
 const paletteOverlay = document.getElementById('palette-overlay');
@@ -41,7 +41,7 @@ const PALETTE_ITEMS = [
   { label: 'Contact',  cat: 'section', action: () => scrollToSection('sec-contact') },
 
   // --- actions ---
-  { label: 'Typing speedrun', cat: 'action', action: () => openGame() },
+  { label: 'Joke bot', cat: 'action', action: () => openGame() },
 
   // --- socials (built from SOCIALS in config.js) ---
   ...SOCIALS.map(s => ({
