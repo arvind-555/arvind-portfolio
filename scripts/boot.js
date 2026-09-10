@@ -25,12 +25,7 @@ const BOOT = [
 let bootIndex = 0;
 
 function playBoot() {
-  // Don't yank focus back to the terminal if the joke-bot overlay is open
-  // (someone could open it before this boot sequence finishes).
-  if (bootIndex >= BOOT.length) {
-    if (!gameOverlay.classList.contains('open')) input.focus();
-    return;
-  }
+  if (bootIndex >= BOOT.length) { input.focus(); return; }
   const [cls, text] = BOOT[bootIndex++];
   printLine(text, cls);
   setTimeout(playBoot, 220);

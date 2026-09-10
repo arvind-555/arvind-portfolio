@@ -8,7 +8,7 @@ framework, no dependencies**. You can open `index.html` and it just works.
 ## Why it's built this way
 
 Everything on this site is hand-written vanilla JavaScript (the terminal, the
-custom cursor, the particle background, the mini-game). React/Vite would mean
+custom cursor, the particle background). React/Vite would mean
 rewriting all of that for no benefit and adding a build pipeline you'd have to
 maintain. Plain files are the least fragile option and the easiest to come back
 to later. The trade-off: no hot-reload while editing (you refresh the browser
@@ -39,7 +39,6 @@ scripts/                 Plain <script> files, loaded in order by index.html.
   motion.js              Scroll reveal + hero "decode" + scroll progress bar.
   hover-preview.js       The panel that follows the mouse over project rows.
   command-palette.js     The Cmd/Ctrl+K quick-nav palette.
-  jokebot.js             The "Joke Bot" mini-game (edit the jokes in there).
   easter-eggs.js         The Konami code.
   boot.js                The terminal's intro text (loads last).
 
@@ -114,8 +113,10 @@ bottom of `index.html` (they're commented).
 
 ### A custom domain later
 Vercel project → **Settings → Domains** → add your domain and follow the DNS
-instructions. Then update the `og:*` / canonical URLs in `index.html` (there's a
-commented block in `<head>`).
+instructions. Then update the three absolute URLs in `index.html`'s `<head>` —
+`og:image`, `og:url`, `twitter:image`, and the `"url"` in the JSON-LD block —
+to the new domain (they're currently the `arvind-portfolio-rho-flame.vercel.app`
+URL).
 
 ---
 
@@ -138,4 +139,4 @@ deploys, and the analytics is already wired in.
 - Respects the OS "reduce motion" setting (disables the hero decode, scroll
   reveals, and the pulsing status dot).
 - Below 860px the layout collapses to one column and the desktop-only bits
-  (custom cursor, hover preview, palette chip, game chip) are hidden.
+  (custom cursor, hover preview, palette chip) are hidden.

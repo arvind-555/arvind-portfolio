@@ -39,6 +39,21 @@ const SITE = {
   // Shown by the terminal `whoami` command.
   whoami: 'uid=1(arvind) groups=(builder,overthinker,chai-enthusiast) — co-founder & CTO @ Storyphy, shipping things that occasionally work on the first try.',
 
+  // The line under your name in the hero. It types itself out, waits, erases,
+  // and moves to the next — looping forever. scripts/motion.js drives it.
+  //  • The FIRST entry is the "real" one. Keep it matching the text hard-coded
+  //    in index.html (.role) so the page reads right before JS runs and when
+  //    "reduce motion" is on (in that case it just stays on the first entry).
+  //  • Add / remove / reword freely. Keep them short — one line each.
+  roles: [
+    'Co-founder & CTO @ Storyphy',
+    'occasional Rust apologist',
+    'full-time bug author, part-time bug fixer',
+    'professional context-switcher',
+    'turns chai into commits',
+    'still refactoring my sleep schedule',
+  ],
+
   // The "currently building" project. Used by the terminal `storyphy` command.
   // (The visible card for this is in index.html, in the projects section.)
   storyphy: {

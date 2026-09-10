@@ -21,14 +21,19 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
 <!-- Social share preview — shows up when this link is pasted into iMessage,
-     Slack, LinkedIn, X, etc. og-image.png already exists (1200×630).
-     TODO: swap YOUR-DOMAIN for your real domain once you have one (or your
-     vercel.app URL in the meantime), then this is live as-is. -->
+     Slack, LinkedIn, X, etc. og-image.png is 1200×630.
+     If you add a custom domain later, update the two absolute URLs below (and
+     the "url" in the JSON-LD block) to match — they must be absolute for
+     scrapers to resolve the image. -->
+<meta property="og:type" content="website">
 <meta property="og:title" content="Arvind Pal — builder">
 <meta property="og:description" content="I build things, mostly software. Co-founder &amp; CTO at Storyphy.">
-<meta property="og:image" content="https://YOUR-DOMAIN/assets/og-image.png">
-<meta property="og:url" content="https://YOUR-DOMAIN/">
+<meta property="og:image" content="https://arvind-portfolio-rho-flame.vercel.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://arvind-portfolio-rho-flame.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://arvind-portfolio-rho-flame.vercel.app/assets/og-image.png">
 
 <!-- Structured data — lets search engines (and AI answers) know who this
      page is about. Harmless if you never touch it again. -->
@@ -39,7 +44,7 @@
   "name": "Arvind Pal",
   "jobTitle": "Co-founder & CTO",
   "worksFor": { "@type": "Organization", "name": "Storyphy", "url": "https://storyphy.in" },
-  "url": "https://YOUR-DOMAIN/",
+  "url": "https://arvind-portfolio-rho-flame.vercel.app/",
   "sameAs": [
     "https://github.com/arvind-555",
     "https://www.linkedin.com/in/arvind-pal-1b156527b/",
@@ -77,25 +82,8 @@
   <span class="plabel" id="hoverLabel"></span>
 </div>
 
-<!-- bottom-corner chips -->
+<!-- bottom-corner chip -->
 <div id="cmdkHint" style="cursor:pointer;"><kbd>&#8984;</kbd><kbd>K</kbd> quick nav <span style="opacity:.6;">or /</span></div>
-<div id="gameTrigger"><span class="bd"></span>need a laugh? &middot; click here</div>
-
-<!-- joke bot overlay → scripts/jokebot.js
-     (all the interactive UI inside #jokeStage is built in JS, not here) -->
-<div id="gameOverlay">
-  <div id="gameBar">
-    <span class="g-title">joke_bot.exe</span>
-    <div class="g-stats">
-      <span>jokes told: <span id="jCount">0</span></span>
-      <span>groans: <span id="jGroans">0</span></span>
-    </div>
-    <span id="gameClose">&times;</span>
-  </div>
-  <div id="gameArena">
-    <div id="jokeStage"></div>
-  </div>
-</div>
 
 <!-- command palette overlay → scripts/command-palette.js -->
 <div id="palette-overlay">
@@ -151,7 +139,10 @@
            • The <h1> text: "Arvind Pal — builder." The word before the period
              is the tagline — change "builder" to whatever fits (the hero
              "decode" animation in scripts/motion.js reads whatever is here).
-           • .role  — your one-line role/status line.
+           • .role  — the line below the name CYCLES through SITE.roles in
+             scripts/config.js (typewriter effect in scripts/motion.js). The
+             text sitting here is just the first one / the no-JS fallback —
+             keep it matching SITE.roles[0].
            • .desc  — the intro paragraph. Rewrite in your own voice.
            • .status — the little monospace status line.
          ==================================================================== -->
@@ -159,7 +150,7 @@
       <div class="avatar-wrap"><img src="assets/avatar.jpg" alt="Arvind Pal"></div>
       <div>
         <h1 id="heroTitle">Arvind Pal — builder.</h1>
-        <div class="role mono">Co-founder &amp; CTO @ Storyphy — and a few other things</div>
+        <div class="role mono" id="heroRole">Co-founder &amp; CTO @ Storyphy</div>
         <p class="desc">I build things, mostly software. This is one of the rare pages I've actually written words for, so go easy on it.</p>
         <div class="status">
           <span class="dot live" style="width:6px;height:6px;"></span>
@@ -260,7 +251,6 @@
        motion.js          scroll reveal + hero decode + progress bar
        hover-preview.js   mouse-following project preview
        command-palette.js Cmd/Ctrl+K palette
-       jokebot.js         the mini-game; defines openGame
        easter-eggs.js     Konami code
        boot.js            terminal intro text (must be last)
      ========================================================================= -->
@@ -272,7 +262,6 @@
 <script src="scripts/motion.js"></script>
 <script src="scripts/hover-preview.js"></script>
 <script src="scripts/command-palette.js"></script>
-<script src="scripts/jokebot.js"></script>
 <script src="scripts/easter-eggs.js"></script>
 <script src="scripts/boot.js"></script>
 

@@ -19,8 +19,6 @@
 
    DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS).
    PROVIDES (used by later scripts): scrollToSection(), printLine(), `input`.
-   `openGame()` is called by the `play` command but defined in jokebot.js —
-   that's fine, it only needs to exist by the time someone types `play`.
    ========================================================================= */
 
 const log   = document.getElementById('log');
@@ -70,7 +68,6 @@ const COMMANDS = {
     printLine(`  storyphy        what I'm building right now`);
     printLine(`  off-duty        what I do when I'm not building`);
     printLine(`  socials         where else to find me`);
-    printLine(`  play            a small game. try it.`);
     printLine(`  contact         how to reach me`);
     printLine(`  clear           clear this log`);
     printLine(`  (a few more exist. poke around.)`);
@@ -89,11 +86,6 @@ const COMMANDS = {
       .map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name.toLowerCase()}</a>`)
       .join(' · ');
     printLine(links);
-  },
-
-  play() {
-    printLine(`launching joke_bot.exe ...`);
-    openGame();   // defined in scripts/jokebot.js
   },
 
   whoami() {

@@ -1,16 +1,18 @@
 /* ============================================================================
-   motion.js  —  three small scroll/entrance effects
+   motion.js  —  four small scroll/entrance effects
    ============================================================================
 
    Contains:
      1. Scroll reveal   — sections fade + rise + un-blur as they enter view.
      2. Hero decode     — the name headline "unscrambles" itself on load.
      3. Scroll progress — the thin amber bar at the very top of the window.
+     4. Role cycle      — the line under the name types/erases through SITE.roles.
 
-   All three respect the OS "reduce motion" accessibility setting.
+   All four respect the OS "reduce motion" accessibility setting.
 
    DEPENDS ON: render.js must run first (this file tags .dirrow / .stackitem /
    .social / .offrow elements, which render.js creates from config.js).
+   Also reads SITE.roles from config.js for effect 4.
    ========================================================================= */
 
 
@@ -80,3 +82,40 @@ function updateProgress() {
 }
 addEventListener('scroll', updateProgress, { passive: true });
 updateProgress();
+
+
+/* ---- 4. HERO ROLE CYCLE ---------------------------------------------------
+   The line under the name (#heroRole) types itself out, holds, erases, and
+   moves to the next entry in SITE.roles (config.js) — looping forever, with a
+   blinking caret. Skipped entirely when reduce-motion is on, which leaves the
+   first role (the text hard-coded in index.html) showing statically.
+
+   Tuning: HOLD_MS (pause on a full line), TYPE_MS / ERASE_MS (per-character). */
+const heroRoleEl = document.getElementById('heroRole');
+const roles = (typeof SITE !== 'undefined' && Array.isArray(SITE.roles)) ? SITE.roles : [];
+
+if (heroRoleEl && roles.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const HOLD_MS = 2800, TYPE_MS = 45, ERASE_MS = 25;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // Rebuild #heroRole as [ text span ][ caret span ] so the caret can sit
+  // inline at the end of the text while we only rewrite the text span.
+  heroRoleEl.textContent = '';
+  const textSpan = document.createElement('span');
+  const caret = document.createElement('span');
+  caret.className = 'role-caret';
+  caret.textContent = '_';
+  textSpan.textContent = roles[0];
+  heroRoleEl.append(textSpan, caret);
+
+  (async function cycleRoles() {
+    let idx = 0, text = roles[0];
+    while (true) {
+      await sleep(HOLD_MS);
+      for (let i = text.length; i >= 0; i--) { textSpan.textContent = text.slice(0, i); await sleep(ERASE_MS); }
+      idx = (idx + 1) % roles.length;
+      text = roles[idx];
+      for (let i = 1; i <= text.length; i++) { textSpan.textContent = text.slice(0, i); await sleep(TYPE_MS); }
+    }
+  })();
+}

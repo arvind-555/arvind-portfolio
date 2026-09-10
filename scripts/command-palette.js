@@ -16,8 +16,7 @@
    Most entries are built from config.js so they stay in sync with the rest of
    the site. To add a one-off command, push another object into PALETTE_ITEMS.
 
-   DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS), terminal.js (scrollToSection),
-   jokebot.js (openGame — only needed when that entry is chosen).
+   DEPENDS ON: config.js (SITE, SOCIALS, PROJECTS), terminal.js (scrollToSection).
    ========================================================================= */
 
 const paletteOverlay = document.getElementById('palette-overlay');
@@ -40,9 +39,6 @@ const PALETTE_ITEMS = [
   { label: 'Socials',  cat: 'section', action: () => scrollToSection('sec-socials') },
   { label: 'Contact',  cat: 'section', action: () => scrollToSection('sec-contact') },
 
-  // --- actions ---
-  { label: 'Joke bot', cat: 'action', action: () => openGame() },
-
   // --- socials (built from SOCIALS in config.js) ---
   ...SOCIALS.map(s => ({
     label: s.name, cat: 'social',
@@ -55,7 +51,7 @@ const PALETTE_ITEMS = [
     action: () => jumpToProject(p.id),
   })),
 
-  // --- more actions ---
+  // --- actions ---
   { label: 'Copy email',    cat: 'action', action: () => { navigator.clipboard?.writeText(SITE.email); } },
   { label: 'Open Storyphy', cat: 'action', action: () => window.open(SITE.storyphy.url, '_blank') },
 ];
